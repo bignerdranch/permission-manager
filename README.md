@@ -5,7 +5,7 @@ This library is designed around two assumptions about how developers/designers w
 
 1. Any Fragment/Activity, at any time might request a permission. This might result in multiple components all asking for one or more permission *at the same time*.
 
-2. Developers will want to display an *in context* permission rationale in a uniform constant way: a simple Dialog. Ahead-of-time permission rationale messages don't really need to interact with the system's permission
+2. Developers will want to display an *in context* permission rationale in a uniform constant way: a simple Dialog.
 
 ## Goals
 1. K.I.S.S.
