@@ -65,7 +65,7 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
                 for (int i = 0; i < permissions.length; i++) {
                     String permission = permissions[i];
                     int result = grantResults[i];
-                    PermissionManager.getInstance().onPermissionResponse(permission, result);
+                    PermissionManager.onPermissionResponse(permission, result);
                 }
                 finish();
                 overridePendingTransition(0, 0); // disable exit animation in case user hit back button

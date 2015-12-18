@@ -17,22 +17,6 @@ public final class PermissionManager {
     private static Map<String, Collection<WeakReference<PermissionListener>>> sPendingPermissionRequests;
 
     /**
-     * Get instance of the PermissionManager
-     * @return PermissionManager
-     */
-    public static PermissionManager getInstance() {
-        if (sPermissionManager == null) {
-            sPermissionManager = new PermissionManager();
-        }
-
-        return sPermissionManager;
-    }
-
-    private PermissionManager() {
-        sPendingPermissionRequests = new HashMap<>();
-    }
-
-    /**
      * Ask for a certain permission. Request is asynchronous. Result is delivered to PermissionListener
      *
      * @param activity    Current activity
@@ -40,9 +24,11 @@ public final class PermissionManager {
      * @param listener    Listener that will receive response from the request. Be sure to hold onto instance. This method will not maintain strong reference.
      * @param rationalMsg Rationale message for why this permission is being requested. Used by the PermissionManager if a Rationale Dialog needs to be displayed
      */
-    public void askForPermission(Activity activity, String permission, PermissionListener listener, String rationalMsg) {
+    public static void askForPermission(Activity activity, String permission, PermissionListener listener, String rationalMsg) {
 
-        cleanupPendingRequestList();
+        PermissionManager instance = getInstance();
+
+        instance.cleanupPendingRequestList();
 
         if (sPendingPermissionRequests.containsKey(permission)) {  // permission request is already in flight
             sPendingPermissionRequests.get(permission).add(new WeakReference<>(listener));
@@ -54,7 +40,7 @@ public final class PermissionManager {
 
         int permissionCheck = ContextCompat.checkSelfPermission(activity, permission);
         if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            notifyListeners(permission, permissionCheck);
+            instance.notifyListeners(permission, permissionCheck);
             return;
         }
 
@@ -68,8 +54,23 @@ public final class PermissionManager {
      * @param permission Permission being requested
      * @param result     Was permission granted or denied
      */
-    void onPermissionResponse(String permission, int result) {
-        notifyListeners(permission, result);
+    static void onPermissionResponse(String permission, int result) {
+        PermissionManager instance = getInstance();
+        instance.notifyListeners(permission, result);
+    }
+
+    private static PermissionManager getInstance() {
+        // only self can instantiate; singleton pattern
+        if (sPermissionManager == null) {
+            sPermissionManager = new PermissionManager();
+        }
+
+        return sPermissionManager;
+    }
+
+    private PermissionManager() {
+        // only self can instantiate; singleton pattern
+        sPendingPermissionRequests = new HashMap<>();
     }
 
     private void notifyListeners(String permission, int result) {

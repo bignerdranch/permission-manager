@@ -31,7 +31,7 @@ public class MainFragment extends Fragment {
                 }
             }
         };
-        PermissionManager.getInstance().askForPermission(getActivity(),
+        PermissionManager.askForPermission(getActivity(),
                 Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 mListener,
                 "Fragment needs Storage permission to save your info. This app won't work without them.2");
