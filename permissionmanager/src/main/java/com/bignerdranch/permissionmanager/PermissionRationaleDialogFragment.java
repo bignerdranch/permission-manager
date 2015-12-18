@@ -13,7 +13,14 @@ public final class PermissionRationaleDialogFragment extends DialogFragment {
     private static final String ARG_PERMISSION = "PermissionRationaleDialogFragment.ARG_PERMISSION";
     private String mPermission;
 
-    public static PermissionRationaleDialogFragment newInstance(String permission, String rationaleMsg) {
+    /**
+     * Package Private
+     *
+     * @param permission   Permission being requested
+     * @param rationaleMsg Message to display in rationale dialog
+     * @return A new instance of this Fragment
+     */
+    static PermissionRationaleDialogFragment newInstance(String permission, String rationaleMsg) {
 
         Bundle args = new Bundle();
         args.putString(ARG_RATIONALE_MSG, rationaleMsg);
@@ -47,10 +54,17 @@ public final class PermissionRationaleDialogFragment extends DialogFragment {
                 && getActivity() instanceof DialogDismissedListener) {
             ((DialogDismissedListener) getActivity()).onPermissionRationaleDialogDismissed(mPermission);
         }
-
     }
 
+    /**
+     * Interface to be notified when this dialog is dismissed
+     */
     public interface DialogDismissedListener {
+        /**
+         *  Callback notifying that a dialog has been dismissed
+         *
+         * @param permission Permission being requested
+         */
         void onPermissionRationaleDialogDismissed(String permission);
     }
 }
