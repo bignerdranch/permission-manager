@@ -1,5 +1,7 @@
 # PermissionManager
 
+Easily and seamlessly ask for Android runtime permissions.
+
 ## Assumptions
 This library is designed around two assumptions about how developers/designers will want to ask for run-time permissions:
 
