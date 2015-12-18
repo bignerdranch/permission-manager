@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        PermissionManager.getInstance().askForPermission(this,
+        PermissionManager.askForPermission(this,
                 Manifest.permission.GET_ACCOUNTS,
                 mListener,
                 "Activity needs Contacts permission to access your accounts. This app won't work without them.");

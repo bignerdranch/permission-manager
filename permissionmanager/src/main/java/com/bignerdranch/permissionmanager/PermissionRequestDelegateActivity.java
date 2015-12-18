@@ -13,7 +13,7 @@ import android.text.TextUtils;
  * - make request via PackageManager
  * - display rationale dialog
  * - display request dialog
- * <p>
+ * <p/>
  * This activity exists so that Permission Manager can delegate UI components to ONLY ONE Activity
  */
 public final class PermissionRequestDelegateActivity extends AppCompatActivity
@@ -27,7 +27,15 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     private String mRationaleMsg;
     private String mPermission;
 
-    public static Intent newIntent(Context context, String permission, String rationaleMsg) {
+    /**
+     * Package Private
+     *
+     * @param context      a context to create Intent
+     * @param permission   Permission being requested
+     * @param rationaleMsg Message to display if/when we need to show a rationale dialog
+     * @return Intent to start this Activity
+     */
+    static Intent newIntent(Context context, String permission, String rationaleMsg) {
         Intent intent = new Intent(context, PermissionRequestDelegateActivity.class);
         intent.putExtra(EXTRA_PERMISSION, permission);
         intent.putExtra(EXTRA_RATIONALE_MSG, rationaleMsg);
@@ -38,24 +46,9 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         mPermission = getIntent().getStringExtra(EXTRA_PERMISSION);
         mRationaleMsg = getIntent().getStringExtra(EXTRA_RATIONALE_MSG);
         tryToGetPermission();
-    }
-
-    private void tryToGetPermission() {
-
-        boolean shouldShowRationale = false;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            shouldShowRationale = shouldShowRequestPermissionRationale(mPermission);
-        }
-
-        if (shouldShowRationale && !TextUtils.isEmpty(mRationaleMsg)) {
-            displayPermissionRationaleDialog();
-        } else {
-            askSystemForPermission();
-        }
     }
 
     @Override
@@ -72,7 +65,7 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
                 for (int i = 0; i < permissions.length; i++) {
                     String permission = permissions[i];
                     int result = grantResults[i];
-                    PermissionManager.getInstance().onPermissionResponse(permission, result);
+                    PermissionManager.onPermissionResponse(permission, result);
                 }
                 finish();
                 overridePendingTransition(0, 0); // disable exit animation in case user hit back button
@@ -90,6 +83,20 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     private void displayPermissionRationaleDialog() {
         PermissionRationaleDialogFragment permissionRationaleDialogFragment = PermissionRationaleDialogFragment.newInstance(mPermission, mRationaleMsg);
         permissionRationaleDialogFragment.show(getSupportFragmentManager(), TAG_PERMISSION_RATIONALE_DIALOG);
+    }
+
+    private void tryToGetPermission() {
+
+        boolean shouldShowRationale = false;
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            shouldShowRationale = shouldShowRequestPermissionRationale(mPermission);
+        }
+
+        if (shouldShowRationale && !TextUtils.isEmpty(mRationaleMsg)) {
+            displayPermissionRationaleDialog();
+        } else {
+            askSystemForPermission();
+        }
     }
 
     private void askSystemForPermission() {
