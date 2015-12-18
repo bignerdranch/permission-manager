@@ -12,6 +12,12 @@
     <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
               android:text="We'll use an Activity hosting two Fragments in a two-pane layout to represent multiple components, each requesting permission(s) at the same time. \n\n In reality, *any combination* of Fragments and Activities can asynchronously and in parallel call into Permission Manager and request a permission."/>
 
+    <Button android:id="@+id/activity_main_single_permission_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Single permission request"/>
+
     <Button android:id="@+id/activity_main_two_components_same_permission_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

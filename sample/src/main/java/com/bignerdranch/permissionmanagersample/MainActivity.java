@@ -13,6 +13,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Button singlePermissionButton = (Button) findViewById(R.id.activity_main_single_permission_button);
+        singlePermissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = SinglePermissionRequestActivity.newIntent(MainActivity.this);
+                startActivity(intent);
+            }
+        });
+
         Button twoComponentsSamePermissionButton = (Button) findViewById(R.id.activity_main_two_components_same_permission_button);
         twoComponentsSamePermissionButton.setOnClickListener(new View.OnClickListener() {
             @Override
