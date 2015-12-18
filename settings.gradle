@@ -1,1 +1,1 @@
-include ':permissionmanager'
+include ':permissionmanager', ':sample'
