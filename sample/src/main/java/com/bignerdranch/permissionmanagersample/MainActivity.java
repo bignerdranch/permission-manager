@@ -1,47 +1,34 @@
 package com.bignerdranch.permissionmanagersample;
 
-import android.Manifest;
+import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
-
-import com.bignerdranch.permissionmanager.PermissionListener;
-import com.bignerdranch.permissionmanager.PermissionManager;
+import android.view.View;
+import android.widget.Button;
 
 public class MainActivity extends AppCompatActivity {
-
-    private PermissionListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FragmentManager fragmentManager = getSupportFragmentManager();
-
-        if (fragmentManager.findFragmentById(R.id.fragment_container) == null) {
-            Fragment fragment = MainFragment.newInstance();
-            fragmentManager.beginTransaction()
-                    .add(R.id.fragment_container, fragment)
-                    .commit();
-        }
-
-        mListener = new PermissionListener() {
+        Button twoComponentsSamePermissionButton = (Button) findViewById(R.id.activity_main_two_components_same_permission_button);
+        twoComponentsSamePermissionButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onResult(boolean permissionGranted) {
-                if (permissionGranted) {
-                    Toast.makeText(MainActivity.this, "Activity received permission granted", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(MainActivity.this, "Activity received permission denied", Toast.LENGTH_SHORT).show();
-                }
+            public void onClick(View v) {
+                Intent intent = TwoComponentsSamePermissionActivity.newIntent(MainActivity.this);
+                startActivity(intent);
             }
-        };
+        });
 
-        PermissionManager.askForPermission(this,
-                Manifest.permission.GET_ACCOUNTS,
-                mListener,
-                "Activity needs Contacts permission to access your accounts. This app won't work without them.");
+        Button twoComponentsDifferentPermissionButton = (Button) findViewById(R.id.activity_main_two_components_different_permission_button);
+        twoComponentsDifferentPermissionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = TwoComponentsDifferentPermissionActivity.newIntent(MainActivity.this);
+                startActivity(intent);
+            }
+        });
     }
 }
