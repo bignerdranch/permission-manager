@@ -33,7 +33,7 @@ public final class PermissionManager {
     }
 
     /**
-     * Ask the for a certain permission. Request is asynchronous. Result is delivered to PermissionListener
+     * Ask for a certain permission. Request is asynchronous. Result is delivered to PermissionListener
      *
      * @param activity    Current activity
      * @param permission  The permission you are requesting
