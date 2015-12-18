@@ -25,16 +25,16 @@ public class MainFragment extends Fragment {
             @Override
             public void onResult(boolean permissionGranted) {
                 if (permissionGranted) {
-                    Toast.makeText(getContext(), "Fragment received permission granted", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Fragment received storage granted", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getContext(), "Fragment received permission denied", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Fragment received storage denied", Toast.LENGTH_SHORT).show();
                 }
             }
         };
         PermissionManager.getInstance().askForPermission(getActivity(),
-                Manifest.permission.GET_ACCOUNTS,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 mListener,
-                "Fragment needs Contacts permission to access your accounts. This app won't work without them.2");
+                "Fragment needs Storage permission to save your info. This app won't work without them.2");
     }
 
 }
