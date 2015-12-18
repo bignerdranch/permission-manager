@@ -3,7 +3,7 @@
 Easily and seamlessly ask for Android runtime permissions.
 
 ## Assumptions
-This library is designed around two assumptions about how developers/designers will want to ask for run-time permissions:
+This library is designed around two assumptions about how developers/designers will want to ask for runtime permissions:
 
 1. Any Fragment/Activity, at any time might request a permission. This might result in multiple components all asking for one or more permission *at the same time*.
 
