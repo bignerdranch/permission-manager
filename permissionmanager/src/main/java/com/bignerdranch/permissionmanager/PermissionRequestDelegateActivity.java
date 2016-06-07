@@ -68,7 +68,7 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
                     PermissionManager.onPermissionResponse(permission, result);
                 }
                 finish();
-                overridePendingTransition(0, 0); // disable exit animation in case user hit back button
+                overridePendingTransition(R.anim.nothing, R.anim.nothing); // disable exit animation in case user hit back button
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
@@ -77,7 +77,7 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(0, 0); // disable exit animation in case user hit back button
+        overridePendingTransition(R.anim.nothing, R.anim.nothing); // disable exit animation in case user hit back button
     }
 
     private void displayPermissionRationaleDialog() {
