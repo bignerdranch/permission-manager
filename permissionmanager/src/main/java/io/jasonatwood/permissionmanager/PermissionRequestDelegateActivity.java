@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanager;
+package io.jasonatwood.permissionmanager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,9 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+
+import io.jasonatwood.permissionmanager.R;
+
 
 /**
  * The permission request workflow requires most work be done from inside an Activity:

@@ -1,12 +1,12 @@
-package com.bignerdranch.permissionmanagersample;
+package io.jasonatwood.permissionmanagersample;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 
-import com.bignerdranch.permissionmanager.PermissionListener;
-import com.bignerdranch.permissionmanager.PermissionManager;
+import io.jasonatwood.permissionmanager.PermissionListener;
+import io.jasonatwood.permissionmanager.PermissionManager;
 
 public class SinglePermissionRequestActivity extends AppCompatActivity {
 

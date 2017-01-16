@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanagersample;
+package io.jasonatwood.permissionmanagersample;
 
 import android.content.Context;
 import android.content.Intent;

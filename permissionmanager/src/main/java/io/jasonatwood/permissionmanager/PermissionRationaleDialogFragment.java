@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanager;
+package io.jasonatwood.permissionmanager;
 
 import android.app.Dialog;
 import android.content.DialogInterface;

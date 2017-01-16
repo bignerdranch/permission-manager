@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.1"
 
     defaultConfig {
-        applicationId "com.bignerdranch.permissionmanagersample"
+        applicationId "io.jasonatwood.permissionmanagersample"
         minSdkVersion 15
         targetSdkVersion 23
         versionCode 1

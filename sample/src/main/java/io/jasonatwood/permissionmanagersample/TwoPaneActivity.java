@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanagersample;
+package io.jasonatwood.permissionmanagersample;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;

@@ -1,4 +1,4 @@
-<manifest package="com.bignerdranch.permissionmanager"
+<manifest package="io.jasonatwood.permissionmanager"
           xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application >

@@ -1,16 +1,17 @@
-package com.bignerdranch.permissionmanagersample;
+package io.jasonatwood.permissionmanagersample;
 
 import android.Manifest;
 import android.support.v4.app.Fragment;
 
-import com.bignerdranch.permissionmanager.PermissionListener;
-import com.bignerdranch.permissionmanager.PermissionManager;
+import io.jasonatwood.permissionmanager.PermissionListener;
+import io.jasonatwood.permissionmanager.PermissionManager;
 
-public class RequestStoragePermissionFragment extends RequestPermissionFragment {
+public class RequestContactsPermissionFragment extends RequestPermissionFragment {
+
     private PermissionListener mListener;
 
     public static Fragment newInstance() {
-        return new RequestStoragePermissionFragment();
+        return new RequestContactsPermissionFragment();
     }
 
     @Override
@@ -30,11 +31,11 @@ public class RequestStoragePermissionFragment extends RequestPermissionFragment 
         PermissionManager.askForPermission(getActivity(),
                 getPermission(),
                 mListener,
-                "Fragment needs Storage permission to blah blah. This app won't work without them.");
+                "Fragment needs Contacts permission to blah blah. This app won't work without them.");
     }
 
     @Override
     protected String getPermission() {
-        return Manifest.permission.WRITE_EXTERNAL_STORAGE;
+        return Manifest.permission.GET_ACCOUNTS;
     }
 }
