@@ -26,30 +26,22 @@ If you need to provide an up-front explanation to the user, you'll have to imple
 </p>
 
 ## Usage
-At any point in your application, you can request a permission. Simply create a `PermissionListener` to handle results. Then ask the PermissionManager for permission, handing off an Activity, the permission being requested, your listener, and a rationale message.
+At any point in your application, you can request a permission. Then ask the PermissionManager for permission, passing in an Activity, the permission being requested, a rationale message, and a PermissionListener to handle response. The method signature makes it easy to use a lamba syntax
 
 ```
 public class MyActivity extends AppCompatActivity {
-
-    private PermissionListener mListener;
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        // create a listener
-        mListener = new PermissionListener() {
-            @Override
-            public void onResult(boolean permissionGranted) {
-                // handle boolean
-            }
-        };
-
         // ask for permission
         PermissionManager.askForPermission(this,
-                Manifest.permission.GET_ACCOUNTS,
-                mListener,
-                "We need Contacts permission to blah blah..");
+                 Manifest.permission.GET_ACCOUNTS,
+                 "We need Contacts permission to blah blah..",
+                 permissionGranted -> {
+                     // TODO handle result
+                 });
     }
 ```
 Once a permission is asked for, PermissionManager will handle all interactions with the system to ensure the user can grant or deny a permission:
@@ -79,7 +71,7 @@ If more than one component asks for the same permission at the same time, the us
 If more than one component needs to ask for a different permission, the user will be presented with the permission (and possibly rationale) dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision. There is no additional code management you need to implement.
 
 ## Caveat
-PermissionManager will not maintain strong references to your PermissionListeners. You need to maintain reference to them (e.g. by making them member fields).
+PermissionManager will maintain strong references to your PermissionListeners until they have been notified.
 
 ## Sample App
 Check out the attached Sample app for implementation examples and demonstrations of the extended usage use-cases.
