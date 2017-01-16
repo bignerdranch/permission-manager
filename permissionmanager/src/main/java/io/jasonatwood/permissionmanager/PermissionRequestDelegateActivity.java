@@ -8,8 +8,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
-import io.jasonatwood.permissionmanager.R;
-
 
 /**
  * The permission request workflow requires most work be done from inside an Activity:
