@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 
+import io.jasonatwood.permissionmanager.PermissionManager;
+
 
 public class MainActivity extends AppCompatActivity {
 

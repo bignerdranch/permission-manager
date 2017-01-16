@@ -1,6 +1,7 @@
 package io.jasonatwood.permissionmanager;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
@@ -12,8 +13,19 @@ import java.util.Map;
 
 public final class PermissionManager {
 
-    private static PermissionManager sPermissionManager;
-    private static Map<String, Collection<PermissionListener>> sPendingPermissionRequests;
+    private static PermissionManager instance;
+
+    private Map<String, Collection<PermissionListener>> pendingPermissionRequests;
+    private Context applicationContext;
+
+    /**
+     * TODO
+     *
+     * @param context
+     */
+    public static void initialize(Context context) {
+        instance = new PermissionManager(context.getApplicationContext());
+    }
 
     /**
      * Ask for a certain permission. Request is asynchronous. Result is delivered to {@link PermissionListener}
@@ -25,19 +37,16 @@ public final class PermissionManager {
      */
     public static void askForPermission(Activity activity, String permission, String rationalMsg, PermissionListener listener) {
 
-        PermissionManager instance = getInstance();
-
-        if (sPendingPermissionRequests.containsKey(permission)) {  // permission request is already in flight
-            sPendingPermissionRequests.get(permission).add(listener);
+        if (instance.pendingPermissionRequests.containsKey(permission)) {  // permission request is already in flight
+            instance.pendingPermissionRequests.get(permission).add(listener);
             return;
         }
 
-        sPendingPermissionRequests.put(permission, new ArrayList<PermissionListener>());
-        sPendingPermissionRequests.get(permission).add(listener);
+        instance.pendingPermissionRequests.put(permission, new ArrayList<PermissionListener>());
+        instance.pendingPermissionRequests.get(permission).add(listener);
 
-        int permissionCheck = ContextCompat.checkSelfPermission(activity, permission);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            instance.notifyListeners(permission, permissionCheck);
+        boolean granted = instance.checkSelfPermission(permission);
+        if (granted) {
             return;
         }
 
@@ -46,33 +55,56 @@ public final class PermissionManager {
     }
 
     /**
-     * Package private. This is called by {@link PermissionRequestDelegateActivity} when it has finished asking system for permission
+     * Package private. This is called by {@link PermissionRequestDelegateActivity} when it has finished asking the system for permission
      *
      * @param permission Permission being requested
      * @param result     Was permission granted or denied
      */
     static void onPermissionResponse(String permission, int result) {
-        PermissionManager instance = getInstance();
         instance.notifyListeners(permission, result);
+
+        // Now that we've heard back about this one permission,
+        // there may be other listeners that are in the same permission GROUP.
+        // Since permissions are granted on a GROUP basis, we may be able to notify those other listeners.
+        instance.checkAllSelfPermissions();
     }
 
-    private static PermissionManager getInstance() {
+    private PermissionManager(Context applicationContext) {
+        this.applicationContext = applicationContext;
+
         // only self can instantiate; singleton pattern
-        if (sPermissionManager == null) {
-            sPermissionManager = new PermissionManager();
+        pendingPermissionRequests = new HashMap<>();
+    }
+
+    private void checkAllSelfPermissions() {
+        for (String permission : pendingPermissionRequests.keySet()) {
+            checkSelfPermission(permission);
         }
-
-        return sPermissionManager;
     }
 
-    private PermissionManager() {
-        // only self can instantiate; singleton pattern
-        sPendingPermissionRequests = new HashMap<>();
+    /**
+     * Determine whether you have been previously granted a particular permission.
+     * If so update all listeners.
+     *
+     * @param permission
+     * @return true if granted, false if not granted
+     */
+    private boolean checkSelfPermission(String permission) {
+        int permissionCheck = ContextCompat.checkSelfPermission(applicationContext, permission);
+        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+            notifyListeners(permission, permissionCheck);
+            return true;
+        }
+        return false;
     }
 
     private void notifyListeners(String permission, int result) {
         // get all listeners for a given permission
-        Collection<PermissionListener> permissionListeners = sPendingPermissionRequests.get(permission);
+        Collection<PermissionListener> permissionListeners = pendingPermissionRequests.get(permission);
+
+        if (permissionListeners == null) {
+            return;
+        }
 
         // notify each listener
         for (PermissionListener permissionListener : permissionListeners) {
@@ -82,6 +114,6 @@ public final class PermissionManager {
         }
 
         // remove all listeners for a given permission
-        sPendingPermissionRequests.remove(permission);
+        pendingPermissionRequests.remove(permission);
     }
 }

@@ -26,7 +26,24 @@ If you need to provide an up-front explanation to the user, you'll have to imple
 </p>
 
 ## Usage
-At any point in your application, you can request a permission. Then ask the PermissionManager for permission, passing in an Activity, the permission being requested, a rationale message, and a PermissionListener to handle response. The method signature makes it easy to use a lamba syntax
+Start by initializing PermissionManager, preferably inside your application:
+
+```
+public class SampleApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        PermissionManager.initialize(this);
+    }
+}
+```
+
+You can initialize PermissionManager with any `Context`, it will hold reference to ApplicationContext, so no need to worry about leaking an Activity. Every time you initialize PermissionManager it will reset any list of pending requests.
+
+
+At any point in your application, you can request a permission. Just ask the PermissionManager for permission, passing in an Activity, the permission being requested, a rationale message, and a PermissionListener to handle the response. The method signature makes it easy to use a lambda syntax
 
 ```
 public class MyActivity extends AppCompatActivity {
@@ -37,11 +54,15 @@ public class MyActivity extends AppCompatActivity {
 
         // ask for permission
         PermissionManager.askForPermission(this,
-                 Manifest.permission.GET_ACCOUNTS,
-                 "We need Contacts permission to blah blah..",
-                 permissionGranted -> {
-                     // TODO handle result
-                 });
+                Manifest.permission.GET_ACCOUNTS,
+                "We need Get Accounts permission to access contacts.",
+                permissionGranted -> {
+                    if (permissionGranted) {
+                        // TODO
+                    } else {
+                        // TODO
+                    }
+                });
     }
 ```
 Once a permission is asked for, PermissionManager will handle all interactions with the system to ensure the user can grant or deny a permission:
