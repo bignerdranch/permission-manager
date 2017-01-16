@@ -96,6 +96,8 @@ Check out the attached Sample app for implementation examples and demonstrations
 
 #### Beyond
 - [ ] handling custom permissions
+- [ ] check that permission is listed in android manifest, if not crash and log
+- [ ] since system grants normal permissions by default, we should just ignore those requests
 
 
 

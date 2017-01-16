@@ -21,7 +21,7 @@ public class SinglePermissionRequestActivity extends AppCompatActivity {
         // ask for permission
         PermissionManager.askForPermission(this,
                 Manifest.permission.GET_ACCOUNTS,
-                "We need Contacts permission to access contacts.",
+                "We need Get Accounts permission to access contacts.",
                 permissionGranted -> {
                     Toast.makeText(this, "permission granted? " + permissionGranted, Toast.LENGTH_SHORT).show();
                 });

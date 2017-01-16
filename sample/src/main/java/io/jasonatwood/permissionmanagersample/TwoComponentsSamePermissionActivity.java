@@ -15,11 +15,11 @@ public class TwoComponentsSamePermissionActivity extends TwoPaneActivity {
 
     @Override
     protected Fragment getTopFragment() {
-        return RequestContactsPermissionFragment.newInstance();
+        return RequestGetAccountsPermissionFragment.newInstance();
     }
 
     @Override
     protected Fragment getBottomFragment() {
-        return RequestContactsPermissionFragment.newInstance();
+        return RequestGetAccountsPermissionFragment.newInstance();
     }
 }

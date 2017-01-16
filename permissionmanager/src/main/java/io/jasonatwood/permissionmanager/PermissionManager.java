@@ -16,7 +16,7 @@ public final class PermissionManager {
     private static Map<String, Collection<PermissionListener>> sPendingPermissionRequests;
 
     /**
-     * Ask for a certain permission. Request is asynchronous. Result is delivered to PermissionListener
+     * Ask for a certain permission. Request is asynchronous. Result is delivered to {@link PermissionListener}
      *
      * @param activity    Current activity
      * @param permission  The permission you are requesting
@@ -46,7 +46,7 @@ public final class PermissionManager {
     }
 
     /**
-     * Package private. This is called by the PermissionRequestDelegateActivity when it has finished asking system for permission
+     * Package private. This is called by {@link PermissionRequestDelegateActivity} when it has finished asking system for permission
      *
      * @param permission Permission being requested
      * @param result     Was permission granted or denied

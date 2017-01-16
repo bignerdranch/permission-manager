@@ -33,5 +33,12 @@
         android:layout_marginTop="16dp"
         android:text="Two components, each requesting a different permission."/>
 
+    <Button
+        android:id="@+id/activity_main_two_components_different_permission_same_group_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Two components, each requesting a different permission. But those permissions are in the same permission group"/>
+
 
 </LinearLayout>

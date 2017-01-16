@@ -19,11 +19,7 @@ public class RequestStoragePermissionFragment extends RequestPermissionFragment 
                 getPermission(),
                 "Fragment needs Storage permission to store stuff. This app won't work without it.",
                 permissionGranted -> {
-                    if (permissionGranted) {
-                        mStatusTextView.setText("Granted");
-                    } else {
-                        mStatusTextView.setText("Denied");
-                    }
+                    updateStatus(permissionGranted);
                 });
     }
 

@@ -5,10 +5,10 @@ import android.support.v4.app.Fragment;
 
 import io.jasonatwood.permissionmanager.PermissionManager;
 
-public class RequestContactsPermissionFragment extends RequestPermissionFragment {
+public class RequestGetAccountsPermissionFragment extends RequestPermissionFragment {
 
     public static Fragment newInstance() {
-        return new RequestContactsPermissionFragment();
+        return new RequestGetAccountsPermissionFragment();
     }
 
     @Override
@@ -17,13 +17,9 @@ public class RequestContactsPermissionFragment extends RequestPermissionFragment
 
         PermissionManager.askForPermission(getActivity(),
                 getPermission(),
-                "Fragment needs Contacts permission to look up contacts. This app won't work without it.",
+                "Fragment needs Get Accounts permission to look up contacts. This app won't work without it.",
                 permissionGranted -> {
-                    if (permissionGranted) {
-                        mStatusTextView.setText("Granted");
-                    } else {
-                        mStatusTextView.setText("Denied");
-                    }
+                    updateStatus(permissionGranted);
                 });
     }
 

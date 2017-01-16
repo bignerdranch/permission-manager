@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 /**
- * Sampe Fragment to request a permission
+ * A Fragment to request a permission
  */
 public abstract class RequestPermissionFragment extends Fragment {
 
@@ -29,4 +29,12 @@ public abstract class RequestPermissionFragment extends Fragment {
     }
 
     protected abstract String getPermission();
+
+    protected void updateStatus(boolean permissionGranted) {
+        if (permissionGranted) {
+            mStatusTextView.setText("Granted");
+        } else {
+            mStatusTextView.setText("Denied");
+        }
+    }
 }
