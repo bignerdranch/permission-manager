@@ -1,27 +1,29 @@
 package io.jasonatwood.permissionmanager;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.content.ContextCompat;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 public final class PermissionManager {
 
+    @SuppressLint("StaticFieldLeak") // who cares since we're holding application context
     private static PermissionManager instance;
+    private static boolean requestInFlight = false;
 
-    private Map<String, Collection<PermissionListener>> pendingPermissionRequests;
+    private List<Request> requests;
     private Context applicationContext;
 
     /**
-     * TODO
+     * Initialize PermissionManager
      *
-     * @param context
+     * @param context any context within your application
      */
     public static void initialize(Context context) {
         instance = new PermissionManager(context.getApplicationContext());
@@ -37,21 +39,43 @@ public final class PermissionManager {
      */
     public static void askForPermission(Activity activity, String permission, String rationalMsg, PermissionListener listener) {
 
-        if (instance.pendingPermissionRequests.containsKey(permission)) {  // permission request is already in flight
-            instance.pendingPermissionRequests.get(permission).add(listener);
+        // we've already been granted permission, return true and bail out
+        boolean granted = instance.checkSelfPermission(permission);
+        if (granted) {
+            listener.onResult(true);
             return;
         }
 
-        instance.pendingPermissionRequests.put(permission, new ArrayList<PermissionListener>());
-        instance.pendingPermissionRequests.get(permission).add(listener);
-
-        boolean granted = instance.checkSelfPermission(permission);
-        if (granted) {
+        // permission request already in list
+        if (instance.listContainsPermission(permission)) {
+            instance.addListener(permission, listener);
             return;
         }
 
         Intent intent = PermissionRequestDelegateActivity.newIntent(activity, permission, rationalMsg);
-        activity.startActivity(intent);
+        int requestCode = permission.hashCode(); // We can't create multiple P.I. with the same intent and the same request code. So cook up a almost certainly unique request code to ensure the system will give us a new P.I.
+        PendingIntent pendingIntent = PendingIntent.getActivity(activity, requestCode, intent, 0);
+        instance.requests.add(new Request(permission, pendingIntent));
+        instance.addListener(permission, listener);
+
+        instance.handleNextRequest();
+    }
+
+    private void handleNextRequest() {
+        if (requestInFlight) {
+            return;
+        }
+
+        if (requests.size() > 0) {
+            Request request = requests.get(0);
+            PendingIntent systemRequest = request.getSystemRequest();
+            try {
+                systemRequest.send();
+                requestInFlight = true;
+            } catch (PendingIntent.CanceledException e) {
+                requests.remove(0);
+            }
+        }
     }
 
     /**
@@ -61,46 +85,55 @@ public final class PermissionManager {
      * @param result     Was permission granted or denied
      */
     static void onPermissionResponse(String permission, int result) {
-        instance.notifyListeners(permission, result);
+        instance.handlePermissionResponse(permission, result);
+    }
+
+    private void handlePermissionResponse(String permission, int result) {
+        boolean granted = result == PackageManager.PERMISSION_GRANTED;
+        notifyListeners(permission, granted);
+
+        removePermission(permission);
 
         // Now that we've heard back about this one permission,
-        // there may be other listeners that are in the same permission GROUP.
-        // Since permissions are granted on a GROUP basis, we may be able to notify those other listeners.
-        instance.checkAllSelfPermissions();
+        // there may be other listeners that have a different permission, but are in the same permission GROUP.
+        // Since permissions are granted on a GROUP basis, we may have been granted access to some of those other permissions.
+        // So let's double check all self permissions before handling the next Request.
+        recheckAllSelfPermissions();
+
+        requestInFlight = false;
+        handleNextRequest();
+    }
+
+    private void recheckAllSelfPermissions() {
+        List<Request> requestsToRemove = new ArrayList<>();
+
+        for (Request request : requests) {
+            String someOtherPermission = request.getPermission();
+            boolean granted = ContextCompat.checkSelfPermission(applicationContext, someOtherPermission) == PackageManager.PERMISSION_GRANTED;
+            if (granted) {
+                notifyListeners(someOtherPermission, true);
+                requestsToRemove.add(request);
+            }
+        }
+
+        requests.removeAll(requestsToRemove);
     }
 
     private PermissionManager(Context applicationContext) {
         this.applicationContext = applicationContext;
 
         // only self can instantiate; singleton pattern
-        pendingPermissionRequests = new HashMap<>();
+        requests = new ArrayList<>();
     }
 
-    private void checkAllSelfPermissions() {
-        for (String permission : pendingPermissionRequests.keySet()) {
-            checkSelfPermission(permission);
-        }
-    }
-
-    /**
-     * Determine whether you have been previously granted a particular permission.
-     * If so update all listeners.
-     *
-     * @param permission
-     * @return true if granted, false if not granted
-     */
     private boolean checkSelfPermission(String permission) {
         int permissionCheck = ContextCompat.checkSelfPermission(applicationContext, permission);
-        if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
-            notifyListeners(permission, permissionCheck);
-            return true;
-        }
-        return false;
+        return permissionCheck == PackageManager.PERMISSION_GRANTED;
     }
 
-    private void notifyListeners(String permission, int result) {
+    private void notifyListeners(String permission, boolean granted) {
         // get all listeners for a given permission
-        Collection<PermissionListener> permissionListeners = pendingPermissionRequests.get(permission);
+        List<PermissionListener> permissionListeners = getListenersForPermission(permission);
 
         if (permissionListeners == null) {
             return;
@@ -109,11 +142,48 @@ public final class PermissionManager {
         // notify each listener
         for (PermissionListener permissionListener : permissionListeners) {
             if (permissionListener != null) {
-                permissionListener.onResult(result == PackageManager.PERMISSION_GRANTED);
+                permissionListener.onResult(granted);
+            }
+        }
+    }
+
+    private boolean listContainsPermission(String permission) {
+        for (Request request : requests) {
+            if (request.getPermission().equals(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void addListener(String permission, PermissionListener listener) {
+        for (Request request : requests) {
+            if (request.getPermission().equals(permission)) {
+                request.addListener(listener);
+            }
+        }
+    }
+
+    private List<PermissionListener> getListenersForPermission(String permission) {
+        for (Request request : requests) {
+            if (request.getPermission().equals(permission)) {
+                return request.getPermissionListeners();
+            }
+        }
+        return null;
+    }
+
+    private void removePermission(String permission) {
+        Request requestToRemove = null;
+        for (Request request : requests) {
+            if (request.getPermission().equals(permission)) {
+                requestToRemove = request;
+                break;
             }
         }
 
-        // remove all listeners for a given permission
-        pendingPermissionRequests.remove(permission);
+        if (requestToRemove != null) {
+            requests.remove(requestToRemove);
+        }
     }
 }
