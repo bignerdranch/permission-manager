@@ -39,6 +39,10 @@ public final class PermissionManager {
      */
     public static void askForPermission(Activity activity, String permission, String rationalMsg, PermissionListener listener) {
 
+        if (instance == null) {
+            throw new RuntimeException("Must initialize PermissionManager before asking for permission");
+        }
+
         // we've already been granted permission, return true and bail out
         boolean granted = instance.checkSelfPermission(permission);
         if (granted) {
