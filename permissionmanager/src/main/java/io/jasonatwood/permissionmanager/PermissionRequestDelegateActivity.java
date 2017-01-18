@@ -77,6 +77,13 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // we may get interrupted and receive null permissions
+        // (as is the case when user rotates while viewing system permission request dialgo)
+        if (mReceivedPermissions == null) {
+            return;
+        }
+
         for (int i = 0; i < mReceivedPermissions.length; i++) {
             String permission = mReceivedPermissions[i];
             int result = mReceivedPermissionsResults[i];
