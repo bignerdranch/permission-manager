@@ -3,6 +3,7 @@ package io.jasonatwood.permissionmanagersample;
 import android.Manifest;
 import android.support.v4.app.Fragment;
 
+import io.jasonatwood.permissionmanager.PermissionListener;
 import io.jasonatwood.permissionmanager.PermissionManager;
 
 public class RequestStoragePermissionFragment extends RequestPermissionFragment {
@@ -11,6 +12,8 @@ public class RequestStoragePermissionFragment extends RequestPermissionFragment 
         return new RequestStoragePermissionFragment();
     }
 
+    PermissionListener mPermissionListener;
+
     @Override
     public void onStart() {
         super.onStart();
@@ -18,9 +21,15 @@ public class RequestStoragePermissionFragment extends RequestPermissionFragment 
         PermissionManager.askForPermission(getActivity(),
                 getPermission(),
                 "Fragment needs Storage permission to store stuff. This app won't work without it.",
-                permissionGranted -> {
-                    updateStatus(permissionGranted);
+                mPermissionListener = permissionGranted -> {
+                    RequestStoragePermissionFragment.this.updateStatus(permissionGranted);
                 });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        PermissionManager.unregister(mPermissionListener);
     }
 
     @Override

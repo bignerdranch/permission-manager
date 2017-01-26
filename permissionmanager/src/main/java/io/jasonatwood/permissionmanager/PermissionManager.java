@@ -65,6 +65,38 @@ public final class PermissionManager {
         instance.handleNextRequest();
     }
 
+    public static void unregister(PermissionListener listener) {
+        instance.removeListener(listener);
+    }
+
+    /**
+     * Package private. This is called by {@link PermissionRequestDelegateActivity} when it has finished asking the system for permission
+     *
+     * @param permission Permission being requested
+     * @param result     Was permission granted or denied
+     */
+    static void onPermissionResponse(String permission, int result) {
+        instance.handlePermissionResponse(permission, result);
+    }
+
+    private void removeListener(PermissionListener listenerToRemove) {
+
+        Request requestToRemove = null;
+
+        for (Request request : requests) {
+            List<PermissionListener> permissionListeners = request.getPermissionListeners();
+            permissionListeners.remove(listenerToRemove);
+            if (permissionListeners.size() == 0) {
+                requestToRemove = request; // no more listeners for this request; might as well remove it
+                break;
+            }
+        }
+
+        if (requestToRemove != null) {
+            requests.remove(requestToRemove);
+        }
+    }
+
     private void handleNextRequest() {
         if (requestInFlight) {
             return;
@@ -80,16 +112,6 @@ public final class PermissionManager {
                 requests.remove(0);
             }
         }
-    }
-
-    /**
-     * Package private. This is called by {@link PermissionRequestDelegateActivity} when it has finished asking the system for permission
-     *
-     * @param permission Permission being requested
-     * @param result     Was permission granted or denied
-     */
-    static void onPermissionResponse(String permission, int result) {
-        instance.handlePermissionResponse(permission, result);
     }
 
     private void handlePermissionResponse(String permission, int result) {
@@ -136,7 +158,6 @@ public final class PermissionManager {
     }
 
     private void notifyListeners(String permission, boolean granted) {
-        // get all listeners for a given permission
         List<PermissionListener> permissionListeners = getListenersForPermission(permission);
 
         if (permissionListeners == null) {

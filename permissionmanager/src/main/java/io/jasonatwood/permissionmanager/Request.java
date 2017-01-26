@@ -5,32 +5,34 @@ import android.app.PendingIntent;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Request {
+/**
+ * package-private
+ */
+class Request {
 
     private String permission;
     private PendingIntent systemRequest;
     private List<PermissionListener> permissionListeners;
 
-
-    public Request(String permission, PendingIntent systemRequest) {
+    Request(String permission, PendingIntent systemRequest) {
         this.permission = permission;
         this.systemRequest = systemRequest;
         permissionListeners = new ArrayList<>();
     }
 
-    public void addListener(PermissionListener listener) {
+    void addListener(PermissionListener listener) {
         permissionListeners.add(listener);
     }
 
-    public String getPermission() {
+    String getPermission() {
         return permission;
     }
 
-    public PendingIntent getSystemRequest() {
+    PendingIntent getSystemRequest() {
         return systemRequest;
     }
 
-    public List<PermissionListener> getPermissionListeners() {
+    List<PermissionListener> getPermissionListeners() {
         return permissionListeners;
     }
 }

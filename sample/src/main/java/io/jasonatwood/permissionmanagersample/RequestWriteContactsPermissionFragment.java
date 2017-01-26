@@ -2,6 +2,7 @@ package io.jasonatwood.permissionmanagersample;
 
 import android.Manifest;
 
+import io.jasonatwood.permissionmanager.PermissionListener;
 import io.jasonatwood.permissionmanager.PermissionManager;
 
 public class RequestWriteContactsPermissionFragment extends RequestPermissionFragment {
@@ -10,6 +11,8 @@ public class RequestWriteContactsPermissionFragment extends RequestPermissionFra
         return new RequestWriteContactsPermissionFragment();
     }
 
+    PermissionListener mPermissionListener;
+
     @Override
     public void onStart() {
         super.onStart();
@@ -17,7 +20,15 @@ public class RequestWriteContactsPermissionFragment extends RequestPermissionFra
         PermissionManager.askForPermission(getActivity(),
                 getPermission(),
                 "We need permission to write contacts",
-                permissionGranted -> updateStatus(permissionGranted));
+                mPermissionListener = permissionGranted -> {
+                    RequestWriteContactsPermissionFragment.this.updateStatus(permissionGranted);
+                });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        PermissionManager.unregister(mPermissionListener);
     }
 
     @Override

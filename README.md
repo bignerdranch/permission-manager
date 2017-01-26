@@ -48,6 +48,8 @@ At any point in your application, you can request a permission. Just ask the Per
 ```
 public class MyActivity extends AppCompatActivity {
 
+    private PermissionListener mPermissionListener;
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -56,14 +58,10 @@ public class MyActivity extends AppCompatActivity {
         PermissionManager.askForPermission(this,
                 Manifest.permission.GET_ACCOUNTS,
                 "We need Get Accounts permission to access contacts.",
-                permissionGranted -> {
-                    if (permissionGranted) {
-                        // TODO
-                    } else {
-                        // TODO
-                    }
-                });
+                mPermissionListener = (permissionGranted) -> showToast(permissionGranted)
+        );
     }
+}
 ```
 Once a permission is asked for, PermissionManager will handle all interactions with the system to ensure the user can grant or deny a permission:
 
@@ -79,6 +77,23 @@ If the system decides it needs to show a rationale message, PermissionManager wi
 	<img src="readme_images/rationale_dialog_example.png">
 </p>
 
+Finally, be sure to unregister all PermissionListeners manually.
+
+```
+public class MyActivity extends AppCompatActivity {
+
+    private PermissionListener mPermissionListener;
+
+    ...
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PermissionManager.unregister(mPermissionListener);
+    }
+}
+```
+
 That's it, that's all there is to it! You decide what happens when a user grants or denies permission. Remember to follow the [Material guidelines on handling denied permissions](https://www.google.com/design/spec/patterns/permissions.html#permissions-request-patterns).
 
 ## Extended Usage
@@ -86,13 +101,13 @@ That's it, that's all there is to it! You decide what happens when a user grants
 The main goal of this library is that any Fragment or Activity can request any permission(s) at any time. PermissionManager can handle all of the following scenarios.
 
 #### Multiple components, asking for the same permission
-If more than one component asks for the same permission at the same time, the user will be presented with the permission (and possibly rationale) dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision. There is no additional code management you need to implement.
+If multiple components ask for the same permission at the same time, the user will be presented with the permission and rationale dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision.
 
 #### Multiple components, asking for different permissions
-If more than one component needs to ask for a different permission, the user will be presented with the permission (and possibly rationale) dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision. There is no additional code management you need to implement.
+If multiple components each ask for a different permission at the same time, the user will be presented with the permission and rationale dialogs once for each permission.
 
-## Caveat
-PermissionManager will maintain strong references to your PermissionListeners until they have been notified.
+#### Multiple components, asking for different permissions, but in the same permission group
+If multiple components each ask for a different permission *but within the same permission group* at the same time, the user will be presented with the permission and rationale dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision.
 
 ## Sample App
 Check out the attached Sample app for implementation examples and demonstrations of the extended usage use-cases.
