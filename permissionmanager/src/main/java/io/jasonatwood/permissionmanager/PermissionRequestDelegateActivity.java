@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanager;
+package io.jasonatwood.permissionmanager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+
 
 /**
  * The permission request workflow requires most work be done from inside an Activity:
@@ -76,6 +77,13 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        // we may get interrupted and receive null permissions
+        // (as is the case when user rotates while viewing system permission request dialgo)
+        if (mReceivedPermissions == null) {
+            return;
+        }
+
         for (int i = 0; i < mReceivedPermissions.length; i++) {
             String permission = mReceivedPermissions[i];
             int result = mReceivedPermissionsResults[i];
