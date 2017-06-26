@@ -2,6 +2,8 @@
 
 Easily and seamlessly ask for Android runtime permissions.
 
+ [ ![Download](https://api.bintray.com/packages/jasonatwood/maven/permissionmanager/images/download.svg) ](https://bintray.com/jasonatwood/maven/permissionmanager/_latestVersion)
+
 ## Assumptions
 This library is designed around two assumptions about how developers/designers will want to ask for runtime permissions:
 
@@ -134,6 +136,17 @@ Check out the attached Sample app for implementation examples and demonstrations
 - [ ] handling custom permissions
 - [ ] check that permission is listed in android manifest, if not crash and log
 - [ ] since system grants normal permissions by default, we should just ignore those requests
+
+## Release Steps
+ * build .aar locally `./gradlew clean assemble`
+ * move .aar into dogfood project and run project
+ * bump `libraryVersion` and `libraryVersionCode` in build.gradle
+ * update CHANGELOG.md
+ * updated README.md
+ * build and upload to bintray `./gradlew clean bintrayUpload`
+ * ensure latest version is uploaded `https://bintray.com/jasonatwood/maven/networkmonkey`
+ * bump version number in dogfood project and ensure it builds
+ * commit and push
 
 
 

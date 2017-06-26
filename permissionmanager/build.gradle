@@ -1,4 +1,31 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'permissionmanager'
+
+    publishedGroupId = 'io.jasonatwood'
+    libraryName = 'PermissionManager'
+    artifact = 'permissionmanager'
+
+    libraryDescription = 'Easily and seamlessly ask for Android runtime permissions.'
+
+    siteUrl = 'https://github.com/tir38/permission-manager'
+    gitUrl = 'https://github.com/tir38/permission-manager.git'
+
+    libraryVersion = '0.3'
+    libraryVersionCode = 3
+
+    developerId = 'jasonatwood'
+    developerName = 'Jason Atwood'
+    developerEmail = 'jwatwood@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 android {
     compileSdkVersion 25
@@ -7,11 +34,84 @@ android {
     defaultConfig {
         minSdkVersion 15
         targetSdkVersion 25
-        versionCode 3
-        versionName "0.3"
+        versionCode libraryVersionCode
+        versionName libraryVersion
     }
 }
 
 dependencies {
     compile 'com.android.support:appcompat-v7:25.1.0'
+}
+
+// Maven Group ID for the artifact
+group = publishedGroupId
+
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                groupId publishedGroupId
+                artifactId artifact
+                name libraryName
+                description libraryDescription
+                url siteUrl
+                licenses {
+                    license {
+                        name licenseName
+                        url licenseUrl
+                    }
+                }
+                developers {
+                    developer {
+                        id developerId
+                        name developerName
+                        email developerEmail
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url siteUrl
+                }
+            }
+        }
+    }
+}
+
+version = libraryVersion
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+artifacts {
+    archives sourcesJar
+}
+
+// Bintray
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = bintrayRepo
+        name = bintrayName
+        desc = libraryDescription
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        licenses = allLicenses
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            desc = libraryDescription
+            gpg {
+                sign = true
+                passphrase = properties.getProperty("bintray.gpg.password")
+            }
+        }
+    }
 }

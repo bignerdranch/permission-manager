@@ -20,5 +20,6 @@ android {
 }
 
 dependencies {
-    compile project(':permissionmanager')
+//    compile project(':permissionmanager')
+    compile 'io.jasonatwood:permissionmanager:0.3'
 }
