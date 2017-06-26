@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanager;
+package io.jasonatwood.permissionmanager;
 
 public interface PermissionListener {
     void onResult(boolean permissionGranted);

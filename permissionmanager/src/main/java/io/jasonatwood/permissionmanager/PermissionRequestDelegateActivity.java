@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanager;
+package io.jasonatwood.permissionmanager;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,12 +8,13 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 
+
 /**
  * The permission request workflow requires most work be done from inside an Activity:
  * - make request via PackageManager
  * - display rationale dialog
  * - display request dialog
- * <p/>
+ * <p>
  * This activity exists so that Permission Manager can delegate UI components to ONLY ONE Activity
  */
 public final class PermissionRequestDelegateActivity extends AppCompatActivity
@@ -26,6 +27,8 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     private static final String EXTRA_RATIONALE_MSG = "PermissionRequestDelegateActivity.EXTRA_RATIONALE_MSG";
     private String mRationaleMsg;
     private String mPermission;
+    private String[] mReceivedPermissions;
+    private int[] mReceivedPermissionsResults;
 
     /**
      * Package Private
@@ -62,22 +65,36 @@ public final class PermissionRequestDelegateActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case REQUEST_PERMISSION_DIALOG:
-                for (int i = 0; i < permissions.length; i++) {
-                    String permission = permissions[i];
-                    int result = grantResults[i];
-                    PermissionManager.onPermissionResponse(permission, result);
-                }
                 finish();
-                overridePendingTransition(0, 0); // disable exit animation in case user hit back button
+                overridePendingTransition(R.anim.nothing, R.anim.nothing); // disable exit animation in case user hit back button
+                mReceivedPermissions = permissions;
+                mReceivedPermissionsResults = grantResults;
             default:
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        // we may get interrupted and receive null permissions
+        // (as is the case when user rotates while viewing system permission request dialgo)
+        if (mReceivedPermissions == null) {
+            return;
+        }
+
+        for (int i = 0; i < mReceivedPermissions.length; i++) {
+            String permission = mReceivedPermissions[i];
+            int result = mReceivedPermissionsResults[i];
+            PermissionManager.onPermissionResponse(permission, result);
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         super.onBackPressed();
-        overridePendingTransition(0, 0); // disable exit animation in case user hit back button
+        overridePendingTransition(R.anim.nothing, R.anim.nothing); // disable exit animation in case user hit back button
     }
 
     private void displayPermissionRationaleDialog() {

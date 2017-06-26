@@ -1,4 +1,4 @@
-package com.bignerdranch.permissionmanagersample;
+package io.jasonatwood.permissionmanagersample;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,11 +15,11 @@ public class TwoComponentsSamePermissionActivity extends TwoPaneActivity {
 
     @Override
     protected Fragment getTopFragment() {
-        return RequestContactsPermissionFragment.newInstance();
+        return RequestGetAccountsPermissionFragment.newInstance();
     }
 
     @Override
     protected Fragment getBottomFragment() {
-        return RequestContactsPermissionFragment.newInstance();
+        return RequestGetAccountsPermissionFragment.newInstance();
     }
 }

@@ -2,6 +2,8 @@
 
 Easily and seamlessly ask for Android runtime permissions.
 
+ [ ![Download](https://api.bintray.com/packages/jasonatwood/maven/permissionmanager/images/download.svg) ](https://bintray.com/jasonatwood/maven/permissionmanager/_latestVersion)
+
 ## Assumptions
 This library is designed around two assumptions about how developers/designers will want to ask for runtime permissions:
 
@@ -26,31 +28,42 @@ If you need to provide an up-front explanation to the user, you'll have to imple
 </p>
 
 ## Usage
-At any point in your application, you can request a permission. Simply create a `PermissionListener` to handle results. Then ask the PermissionManager for permission, handing off an Activity, the permission being requested, your listener, and a rationale message.
+Start by initializing PermissionManager, preferably inside your application:
+
+```
+public class SampleApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        PermissionManager.initialize(this);
+    }
+}
+```
+
+You can initialize PermissionManager with any `Context`, it will hold reference to ApplicationContext, so no need to worry about leaking an Activity. Every time you initialize PermissionManager it will reset any list of pending requests.
+
+
+At any point in your application, you can request a permission. Just ask the PermissionManager for permission, passing in an Activity, the permission being requested, a rationale message, and a PermissionListener to handle the response. The method signature makes it easy to use a lambda syntax
 
 ```
 public class MyActivity extends AppCompatActivity {
 
-    private PermissionListener mListener;
+    private PermissionListener mPermissionListener;
 
     @Override
     protected void onStart() {
         super.onStart();
 
-        // create a listener
-        mListener = new PermissionListener() {
-            @Override
-            public void onResult(boolean permissionGranted) {
-                // handle boolean
-            }
-        };
-
         // ask for permission
         PermissionManager.askForPermission(this,
                 Manifest.permission.GET_ACCOUNTS,
-                mListener,
-                "We need Contacts permission to blah blah..");
+                "We need Get Accounts permission to access contacts.",
+                mPermissionListener = (permissionGranted) -> showToast(permissionGranted)
+        );
     }
+}
 ```
 Once a permission is asked for, PermissionManager will handle all interactions with the system to ensure the user can grant or deny a permission:
 
@@ -66,6 +79,23 @@ If the system decides it needs to show a rationale message, PermissionManager wi
 	<img src="readme_images/rationale_dialog_example.png">
 </p>
 
+Finally, be sure to unregister all PermissionListeners manually.
+
+```
+public class MyActivity extends AppCompatActivity {
+
+    private PermissionListener mPermissionListener;
+
+    ...
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PermissionManager.unregister(mPermissionListener);
+    }
+}
+```
+
 That's it, that's all there is to it! You decide what happens when a user grants or denies permission. Remember to follow the [Material guidelines on handling denied permissions](https://www.google.com/design/spec/patterns/permissions.html#permissions-request-patterns).
 
 ## Extended Usage
@@ -73,13 +103,13 @@ That's it, that's all there is to it! You decide what happens when a user grants
 The main goal of this library is that any Fragment or Activity can request any permission(s) at any time. PermissionManager can handle all of the following scenarios.
 
 #### Multiple components, asking for the same permission
-If more than one component asks for the same permission at the same time, the user will be presented with the permission (and possibly rationale) dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision. There is no additional code management you need to implement.
+If multiple components ask for the same permission at the same time, the user will be presented with the permission and rationale dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision.
 
 #### Multiple components, asking for different permissions
-If more than one component needs to ask for a different permission, the user will be presented with the permission (and possibly rationale) dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision. There is no additional code management you need to implement.
+If multiple components each ask for a different permission at the same time, the user will be presented with the permission and rationale dialogs once for each permission.
 
-## Caveat
-PermissionManager will not maintain strong references to your PermissionListeners. You need to maintain reference to them (e.g. by making them member fields).
+#### Multiple components, asking for different permissions, but in the same permission group
+If multiple components each ask for a different permission *but within the same permission group* at the same time, the user will be presented with the permission and rationale dialogs *only once*. Each component's PermissionListener will then be notified of the user's decision.
 
 ## Sample App
 Check out the attached Sample app for implementation examples and demonstrations of the extended usage use-cases.
@@ -104,6 +134,19 @@ Check out the attached Sample app for implementation examples and demonstrations
 
 #### Beyond
 - [ ] handling custom permissions
+- [ ] check that permission is listed in android manifest, if not crash and log
+- [ ] since system grants normal permissions by default, we should just ignore those requests
+
+## Release Steps
+ * build .aar locally `./gradlew clean assemble`
+ * move .aar into dogfood project and run project
+ * bump `libraryVersion` and `libraryVersionCode` in build.gradle
+ * update CHANGELOG.md
+ * updated README.md
+ * build and upload to bintray `./gradlew clean bintrayUpload`
+ * ensure latest version is uploaded `https://bintray.com/jasonatwood/maven/networkmonkey`
+ * bump version number in dogfood project and ensure it builds
+ * commit and push
 
 
 
